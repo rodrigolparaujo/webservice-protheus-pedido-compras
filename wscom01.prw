@@ -57,7 +57,7 @@ WSRESTFUL PedidoCompras DESCRIPTION 'Pedido de Compras API' SECURITY 'MATA120' F
 ENDWSRESTFUL
 
 /*
-mÈtodo GET - Consulta Pedido de Compras
+m√©todo GET - Consulta Pedido de Compras
 exemplo: http://localhost:3000/rest/PedidoCompras/ConsultarPedido?numero=000001
 */
 WSMETHOD GET ConsultarPedido QUERYPARAM numero WSREST PedidoCompras
@@ -71,8 +71,7 @@ WSMETHOD GET ConsultarPedido QUERYPARAM numero WSREST PedidoCompras
     Parametros de pesquisa
     */
 	if Empty(cPedido)
-		Self:SetResponse('{"noPedido":"' + cPedido + '", "infoMessage":"", "errorMessage":"Numero do Pedido n„o informado"}')
-		SetRestFault(404, 'Pedido nao informado')
+		Self:SetResponse('{"noPedido":"' + cPedido + '", "infoMessage":"", "errorCode":"404", "errorMessage":"Numero do Pedido n√£o informado"}')
 		Return(.F.)
 	EndIF
 
@@ -90,7 +89,7 @@ WSMETHOD GET ConsultarPedido QUERYPARAM numero WSREST PedidoCompras
 	IF (oAlias)->(!Eof())
 		oData := JsonObject():New()
 
-		//Monta o cabeÁalho
+		//Monta o cabe√ßalho
 		oData[ 'noPedido' ]     := Alltrim((oAlias)->C7_NUM)
 		oData[ 'dataEmissao' ]  := Alltrim((oAlias)->C7_EMISSAO)
 		oData[ 'noFornecedor' ]  := Alltrim((oAlias)->C7_FORNECE + (oAlias)->C7_LOJA)
@@ -117,12 +116,11 @@ WSMETHOD GET ConsultarPedido QUERYPARAM numero WSREST PedidoCompras
 
 		FreeObj(oData)
 
-		//Define o retorno do mÈtodo
+		//Define o retorno do m√©todo
 		Self:SetResponse(FwJsonSerialize(aData))
 
 	ELSE
-		Self:SetResponse('{"noPedido":"'+cPedido+'", "infoMessage":"", "errorMessage":"Numero do Pedido n„o encontrado"}') 
-		SetRestFault(404, 'Pedido nao encontrado')
+		Self:SetResponse('{"noPedido":"'+cPedido+'", "infoMessage":"", "errorCode":"404", "errorMessage":"Numero do Pedido n√£o encontrado"}') 
 		lRet    := .F.
 	EndIF
 
@@ -131,7 +129,7 @@ WSMETHOD GET ConsultarPedido QUERYPARAM numero WSREST PedidoCompras
 Return(lRet)
 
 /*
-mÈtodo POST - Criar Pedido de Compras
+m√©todo POST - Criar Pedido de Compras
 exemplo: http://localhost:3000/rest/PedidoCompras/CriarPedido
 */
 WSMETHOD POST CriarPedido WSSERVICE PedidoCompras
@@ -159,25 +157,25 @@ WSMETHOD POST CriarPedido WSSERVICE PedidoCompras
 	Private lMsHelpAuto    := .T.
 	Private lAutoErrNoFile := .T.
 
-	//Se n„o existir o diretÛrio de logs dentro da Protheus Data, ser· criado
+	//Se n√£o existir o diret√≥rio de logs dentro da Protheus Data, ser√° criado
 	IF !ExistDir(PATHLOGSW)
 		MakeDir(PATHLOGSW)
 	EndIF
 
     FwLogMsg("INFO",, "CriarPedido", "WSCOM01", "", "01", "Iniciando")
 
-	//Definindo o conte˙do como JSON, e pegando o content e dando um parse para ver se a estrutura est· ok
+	//Definindo o conte√∫do como JSON, e pegando o content e dando um parse para ver se a estrutura est√° ok
 	Self:SetContentType("application/json")
 	oJson   := JsonObject():New()
 	cError  := oJson:FromJson(cJson)
 
-	//Se tiver algum erro no Parse, encerra a execuÁ„o
+	//Se tiver algum erro no Parse, encerra a execu√ß√£o
 	IF !Empty(cError)
 		FwLogMsg("ERROR",, "CriarPedido", "WSCOM01", "", "01", 'Parser Json Error')
         Self:SetResponse('{"noPedido":"", "infoMessage":"", "errorCode":"500" ,  "errorMessage":"Parser Json Error" }')
 		lRet    := .F.
 	Else
-        //Lendo o cabeÁalho do arquivo JSON
+        //Lendo o cabe√ßalho do arquivo JSON
         cFornLoja:= Alltrim(oJson:GetJsonObject('noFornecedor'))
 		cFornece := Left(cFornLoja,6)
 		cLoja    := Right(cFornLoja,2)
@@ -192,7 +190,7 @@ WSMETHOD POST CriarPedido WSSERVICE PedidoCompras
             Return(.F.)
         Endif
 
-        //Verifica se a condiÁ„o de pagamento existe			    
+        //Verifica se a condi√ß√£o de pagamento existe			    
         If !(Existe("SE4",1,cCondPag))
             FwLogMsg("ERROR",, "CriarPedido", "WSCOM01", "", "01", "Condicao de Pagamento: "+ Alltrim(cCondPag) +" nao existe!")
             Self:SetResponse('{"noPedido":"", "infoMessage":"", "errorCode":"404" ,  "errorMessage":"Condicao de Pagamento '+ Alltrim(cCondPag) +' nao existe" }')
@@ -204,7 +202,7 @@ WSMETHOD POST CriarPedido WSSERVICE PedidoCompras
         oItems  := oJson:GetJsonObject('items')
         IF ValType( oItems ) == "A"
 
-            //Monta o cabeÁalho do pedido de compras apenas se houver itens
+            //Monta o cabe√ßalho do pedido de compras apenas se houver itens
             cPedido := GetSxeNum("SC7","C7_NUM")
 
             aAdd(aCabec,{"C7_FILIAL" , xFilial("SC7")	, NIL})
@@ -242,11 +240,11 @@ WSMETHOD POST CriarPedido WSSERVICE PedidoCompras
 
             Next
 
-            //Executa a inclus„o autom·tica de pedido de compras
+            //Executa a inclus√£o autom√°tica de pedido de compras
             FwLogMsg("INFO",, "CriarPedido", "WSCOM01", "", "01", "MSExecAuto")
 		    MSExecAuto({|v,x,y,z| MATA120(v,x,y,z)},1,aCabec,aItens,3)
 
-            //Se houve erro, gera um arquivo de log dentro do diretÛrio da protheus data
+            //Se houve erro, gera um arquivo de log dentro do diret√≥rio da protheus data
             IF lMsErroAuto
                 RollBackSX8()
                 cArqLog  := "CriarPedido-" + cFornLoja + "-" + DTOS(dDataBase) + "-" + StrTran(Time(), ':' , '-' )+".log"
@@ -275,7 +273,7 @@ WSMETHOD POST CriarPedido WSSERVICE PedidoCompras
 Return(lRet)
 
 /*
-mÈtodo PUT - Alterar Pedido de Compras
+m√©todo PUT - Alterar Pedido de Compras
 exemplo: http://localhost:3000/rest/PedidoCompras/AlterarPedido
 */
 WSMETHOD PUT AlterarPedido WSSERVICE PedidoCompras
@@ -301,25 +299,25 @@ WSMETHOD PUT AlterarPedido WSSERVICE PedidoCompras
 	Private lMsHelpAuto    := .T.
 	Private lAutoErrNoFile := .T.
 
-	//Se n„o existir o diretÛrio de logs dentro da Protheus Data, ser· criado
+	//Se n√£o existir o diret√≥rio de logs dentro da Protheus Data, ser√° criado
 	IF !ExistDir(PATHLOGSW)
 		MakeDir(PATHLOGSW)
 	EndIF
 
     FwLogMsg("INFO",, "AlterarPedido", "WSCOM01", "", "01", "Iniciando")
 
-	//Definindo o conte˙do como JSON, e pegando o content e dando um parse para ver se a estrutura est· ok
+	//Definindo o conte√∫do como JSON, e pegando o content e dando um parse para ver se a estrutura est√° ok
 	Self:SetContentType("application/json")
 	oJson   := JsonObject():New()
 	cError  := oJson:FromJson(cJson)
 
-	//Se tiver algum erro no Parse, encerra a execuÁ„o
+	//Se tiver algum erro no Parse, encerra a execu√ß√£o
 	IF !Empty(cError)
 		FwLogMsg("ERROR",, "AlterarPedido", "WSCOM01", "", "01", 'Parser Json Error')
         Self:SetResponse('{"noPedido":"", "infoMessage":"", "errorCode":"500" ,  "errorMessage":"Parser Json Error" }')
 		lRet    := .F.
 	Else
-        //Lendo o cabeÁalho do arquivo JSON
+        //Lendo o cabe√ßalho do arquivo JSON
         cPedido  := Alltrim(oJson:GetJsonObject('noPedido'))
         cFornLoja:= Alltrim(oJson:GetJsonObject('noFornecedor'))
 		cFornece := Left(cFornLoja,6)
@@ -338,7 +336,7 @@ WSMETHOD PUT AlterarPedido WSSERVICE PedidoCompras
         SC7->(dbSetOrder(1))
         SC7->(dbGoTop())
         If SC7->(dbSeek(xFilial("SC7") + cPedido))
-            //Monta o cabeÁalho do pedido de compras apenas se houver itens
+            //Monta o cabe√ßalho do pedido de compras apenas se houver itens
             aadd(aCabec,{"C7_NUM"       , cPedido})
             aadd(aCabec,{"C7_EMISSAO"   , SC7->C7_EMISSAO})
             aadd(aCabec,{"C7_FORNECE"   , cFornece})
@@ -377,11 +375,11 @@ WSMETHOD PUT AlterarPedido WSSERVICE PedidoCompras
 
                 Next
 
-                //Executa a inclus„o autom·tica de pedido de compras
+                //Executa a inclus√£o autom√°tica de pedido de compras
                 FwLogMsg("INFO",, "AlterarPedido", "WSCOM01", "", "01", "MSExecAuto")
                 MSExecAuto({|a,b,c,d,e| MATA120(a,b,c,d,e)},1,aCabec,aItens,4,.F.)
 
-                //Se houve erro, gera um arquivo de log dentro do diretÛrio da protheus data
+                //Se houve erro, gera um arquivo de log dentro do diret√≥rio da protheus data
                 IF lMsErroAuto
                     cArqLog  := "AlterarPedido-" + cFornLoja + "-" + DTOS(dDataBase) + "-" + StrTran(Time(), ':' , '-' )+".log"
                     aLogAuto := {}
@@ -414,7 +412,7 @@ WSMETHOD PUT AlterarPedido WSSERVICE PedidoCompras
 Return(lRet)
 
 /*
-mÈtodo DELETE - Excluir Pedido de Compras
+m√©todo DELETE - Excluir Pedido de Compras
 exemplo: http://localhost:3000/rest/PedidoCompras/ExcluirPedido
 */
 WSMETHOD DELETE ExcluirPedido WSSERVICE PedidoCompras
@@ -433,25 +431,25 @@ WSMETHOD DELETE ExcluirPedido WSSERVICE PedidoCompras
 	Private lMsHelpAuto    := .T.
 	Private lAutoErrNoFile := .T.
 
-	//Se n„o existir o diretÛrio de logs dentro da Protheus Data, ser· criado
+	//Se n√£o existir o diret√≥rio de logs dentro da Protheus Data, ser√° criado
 	IF !ExistDir(PATHLOGSW)
 		MakeDir(PATHLOGSW)
 	EndIF
 
     FwLogMsg("INFO",, "ExcluirPedido", "WSCOM01", "", "01", "Iniciando")
 
-	//Definindo o conte˙do como JSON, e pegando o content e dando um parse para ver se a estrutura est· ok
+	//Definindo o conte√∫do como JSON, e pegando o content e dando um parse para ver se a estrutura est√° ok
 	Self:SetContentType("application/json")
 	oJson   := JsonObject():New()
 	cError  := oJson:FromJson(cJson)
 
-	//Se tiver algum erro no Parse, encerra a execuÁ„o
+	//Se tiver algum erro no Parse, encerra a execu√ß√£o
 	IF !Empty(cError)
 		FwLogMsg("ERROR",, "ExcluirPedido", "WSCOM01", "", "01", 'Parser Json Error')
         Self:SetResponse('{"noPedido":"", "infoMessage":"", "errorCode":"500" ,  "errorMessage":"Parser Json Error" }')
 		lRet    := .F.
 	Else
-        //Lendo o cabeÁalho do arquivo JSON
+        //Lendo o cabe√ßalho do arquivo JSON
         cPedido  := Alltrim(oJson:GetJsonObject('noPedido'))
         cFornLoja:= Alltrim(oJson:GetJsonObject('noFornecedor'))
 		cFornece := Left(cFornLoja,6)
@@ -470,16 +468,16 @@ WSMETHOD DELETE ExcluirPedido WSSERVICE PedidoCompras
         SC7->(dbSetOrder(1))
         SC7->(dbGoTop())
         If SC7->(dbSeek(xFilial("SC7") + cPedido))
-            //Monta o cabeÁalho do pedido de compras apenas se houver itens
+            //Monta o cabe√ßalho do pedido de compras apenas se houver itens
             aadd(aCabec,{"C7_NUM"       , cPedido})
             aadd(aCabec,{"C7_FORNECE"   , cFornece})
             aadd(aCabec,{"C7_LOJA"      , cLoja})
 
-            //Executa a inclus„o autom·tica de pedido de compras
+            //Executa a inclus√£o autom√°tica de pedido de compras
             FwLogMsg("INFO",, "ExcluirPedido", "WSCOM01", "", "01", "MSExecAuto")
             MSExecAuto({|a,b,c,d,e| MATA120(a,b,c,d,e)},1,aCabec,aItens,5,.F.)
 
-            //Se houve erro, gera um arquivo de log dentro do diretÛrio da protheus data
+            //Se houve erro, gera um arquivo de log dentro do diret√≥rio da protheus data
             IF lMsErroAuto
                 cArqLog  := "ExcluirPedido-" + cFornLoja + "-" + DTOS(dDataBase) + "-" + StrTran(Time(), ':' , '-' )+".log"
                 aLogAuto := {}
@@ -495,7 +493,7 @@ WSMETHOD DELETE ExcluirPedido WSSERVICE PedidoCompras
             EndIF
         Else
             FwLogMsg("ERROR",, "ExcluirPedido", "WSCOM01", "", "01", "Pedido: "+ Alltrim(cPedido) +" nao existe!")
-            Self:SetResponse('{"noPedido":"", "infoMessage":"", "errorCode":"404" ,  "errorMessage":"O pedido de compras '+ cPedido +' nao existe" }')
+            Self:SetResponse('{"noPedido":"", "infoMessage":"", "errorCode":"404",  "errorMessage":"O pedido de compras '+ cPedido +' nao existe" }')
             FreeObj(oJson)
             lRet := .F.
         Endif               
@@ -504,7 +502,7 @@ WSMETHOD DELETE ExcluirPedido WSSERVICE PedidoCompras
 	FreeObj(oJson)
 Return(lRet)
 
-//FunÁ„o para consulta simples se um registro existe
+//Fun√ß√£o para consulta simples se um registro existe
 //Sintaxe: Existe("SB1",1,"090100243")
 //Retorno: .F. ou .T.
 Static Function Existe(cTabela,nOrdem,cConteudo)
