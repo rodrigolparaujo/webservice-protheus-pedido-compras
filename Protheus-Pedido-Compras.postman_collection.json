@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "f1fabc45-b736-49c3-a9d9-0305fc6a1cb5",
+		"name": "Protheus",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26232390"
+	},
+	"item": [
+		{
+			"name": "Pedido de Compras",
+			"item": [
+				{
+					"name": "Consultar Pedido de Compras",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "P@5sWs1",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "usuariows",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/rest/PedidoCompras/ConsultarPedido?numero=000005",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"rest",
+								"PedidoCompras",
+								"ConsultarPedido"
+							],
+							"query": [
+								{
+									"key": "numero",
+									"value": "000005"
+								}
+							]
+						},
+						"description": "Retorno do webservice\n\n``` json\n[\n    {\n        \"noPedido\": \"000004\",\n        \"dataEmissao\": \"20231007\",\n        \"noFornecedor\": \"00000101\",\n        \"condicaoPago\": \"0\",\n        \"items\": [\n            {\n                \"item\": \"0001\",\n                \"produto\": \"000001\",\n                \"uom\": \"UN\",\n                \"quantidade\": 5,\n                \"precoUnitario\": 5.99,\n                \"noSolicitacao\": \"\",\n                \"itemSolicitacao\": \"\",\n                \"dataEntrega\": \"2023-10-07\"\n            },\n            {\n                \"item\": \"0002\",\n                \"produto\": \"000002\",\n                \"uom\": \"UN\",\n                \"quantidade\": 200,\n                \"precoUnitario\": 20.55,\n                \"noSolicitacao\": \"\",\n                \"itemSolicitacao\": \"\",\n                \"dataEntrega\": \"2023-10-07\"\n            }\n        ]\n    }\n]\n\n ```\n\nSe houver algum erro no codigo fonte do webservice, poderá ocorrer o erro:\n\n``` json\n{\"code\":500,\"detailedMessage\":\"\",\"message\":\"Internal Server Error\"}\n\n ```\n\nÉ necessário ver o console.log do appserver onde está executando o webservice para ver qual é o erro."
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Pedido de Compras",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "P@5sWs1",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "usuariows",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"noFornecedor\": \"00000101\",\r\n    \"condicaoPago\": \"0\",\r\n    \"moeda\": 1,\r\n    \"items\": [\r\n        {\r\n            \"produto\": \"000001\",\r\n            \"armazem\": \"01\",\r\n            \"quantidade\": 100,\r\n            \"precoUnitario\": 11.99\r\n        },\r\n        {\r\n            \"produto\": \"000002\",\r\n            \"armazem\": \"01\",\r\n            \"quantidade\": 200,\r\n            \"precoUnitario\": 20.55\r\n        }\r\n    ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/rest/PedidoCompras/CriarPedido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"rest",
+								"PedidoCompras",
+								"CriarPedido"
+							]
+						},
+						"description": "Retorno do Webservice quando sucesso\n\n``` json\n{\n    \"noPedido\": \"000005\",\n    \"infoMessage\": \"PEDIDO CRIADO COM SUCESSO\",\n    \"errorCode\":\"\",\n    \"errorMessage\": \"\"\n}\n\n ```\n\nExemplo de retorno do Webservice quando ocorre um erro\n\n``` json\n{\n    \"noPedido\": \"\",\n    \"infoMessage\": \"\",\n    \"errorCode\": \"404\",\n    \"errorMessage\": \"O fornecedor 100000 - loja 01 nao existe\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Alterar Pedido de Compras",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "P@5sWs1",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "usuariows",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"noPedido\":\"000005\",\r\n    \"noFornecedor\": \"00000101\",\r\n    \"items\": [\r\n        {\r\n            \"item\":\"0001\",\r\n            \"produto\": \"000001\",\r\n            \"quantidade\": 5,\r\n            \"precoUnitario\": 5.99\r\n        }\r\n    ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/rest/PedidoCompras/AlterarPedido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"rest",
+								"PedidoCompras",
+								"AlterarPedido"
+							]
+						},
+						"description": "Retorno do Webservice quando sucesso\n\n``` json\n{\n    \"noPedido\": \"000005\",\n    \"infoMessage\": \"PEDIDO ALTERADO COM SUCESSO\",\n    \"errorCode\":\"\",\n    \"errorMessage\": \"\"\n}\n\n ```\n\nExemplo de retorno do Webservice quando ocorre um erro\n\n``` json\n{\n    \"noPedido\": \"\",\n    \"infoMessage\": \"\",\n    \"errorCode\": \"404\",\n    \"errorMessage\": \"O fornecedor 100000 - loja 01 nao existe\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Excluir Pedido de Compras",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "P@5sWs1",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "usuariows",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"noPedido\":\"000005\",\r\n    \"noFornecedor\": \"00000101\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/rest/PedidoCompras/ExcluirPedido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"rest",
+								"PedidoCompras",
+								"ExcluirPedido"
+							]
+						},
+						"description": "Retorno do Webservice quando sucesso\n\n``` json\n{\n    \"noPedido\": \"000005\",\n    \"infoMessage\": \"PEDIDO EXCLUIDO COM SUCESSO\",\n    \"errorCode\": \"\",\n    \"errorMessage\": \"\"\n}\n\n ```\n\nExemplo de retorno do Webservice quando ocorre um erro\n\n``` json\n{\n    \"noPedido\": \"\",\n    \"infoMessage\": \"\",\n    \"errorCode\": \"404\",\n    \"errorMessage\": \"O fornecedor 100000 - loja 01 nao existe\"\n}\n\n ```"
+					},
+					"response": []
+				}
+			],
+			"description": "Webservice para usar na rotina Pedidos de Compras (MATA120)\n\nPermite criar, alterar , excluir e consultar um pedido de compras"
+		}
+	]
+}
